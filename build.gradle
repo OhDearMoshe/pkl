@@ -6,12 +6,33 @@ plugins {
 group = 'uk.co.mutuallyassureddistraction'
 version = '1.0-SNAPSHOT'
 
+// APP
+def koin_version = '3.3.3'
+def jdbi_version = '3.37.1'
+
+// TEST
+def test_container_version = '1.17.6'
+
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    implementation "io.insert-koin:koin-core:$koin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.8.0"
+
+
+    // Data Access
+    implementation "org.jdbi:jdbi3-core:$jdbi_version"
+    implementation "org.jdbi:jdbi3-postgres:$jdbi_version"
+    implementation "org.jdbi:jdbi3-kotlin:$jdbi_version"
+    implementation "org.jdbi:jdbi3-kotlin-sqlobject:$jdbi_version"
+    implementation("org.postgresql:postgresql:42.5.4")
+
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation "org.testcontainers:testcontainers:$test_container_version"
+    testImplementation "org.testcontainers:postgresql:$test_container_version"
 }
 
 test {

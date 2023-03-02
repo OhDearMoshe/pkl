@@ -11,22 +11,7 @@ import uk.co.mutuallyassureddistraction.paketliga.dao.entity.Guess
 import java.util.*
 
 interface GuessDao {
-    @SqlUpdate(INSERT_GUESS)
-    fun createGuess(guess: Guess)
-
-    @SqlQuery("""
-        SELECT 
-                guessId,
-                gameId,
-                userId,
-                guessTime
-                FROM GUESS
-                WHERE guessId = :id
-    """)
-    fun findGuessByGuessId(@Bind("id") guessId: UUID): Guess
-
-    companion object {
-        private const val INSERT_GUESS = """
+    @SqlUpdate("""
             INSERT INTO GUESS(
                 guessId,
                 gameId,
@@ -39,6 +24,17 @@ interface GuessDao {
                 :guess.userId,
                 :guess.guessTime
             )
-        """
-    }
+        """)
+    fun createGuess(guess: Guess)
+
+    @SqlQuery("""
+        SELECT 
+                guessId,
+                gameId,
+                userId,
+                guessTime
+                FROM GUESS
+                WHERE guessId = :id
+    """)
+    fun findGuessByGuessId(@Bind("id") guessId: UUID): Guess
 }

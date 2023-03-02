@@ -8,5 +8,4 @@ data class Guess(
     val gameId: UUID,
     val userId: String,
     val guessTime: ZonedDateTime
-
 )

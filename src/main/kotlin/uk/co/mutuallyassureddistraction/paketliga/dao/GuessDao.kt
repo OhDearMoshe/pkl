@@ -1,10 +1,6 @@
 package uk.co.mutuallyassureddistraction.paketliga.dao
 
-import org.jdbi.v3.postgres.UUIDArgumentFactory
-import org.jdbi.v3.sqlobject.config.RegisterArgumentFactory
-import org.jdbi.v3.sqlobject.config.RegisterBeanMapper
 import org.jdbi.v3.sqlobject.customizer.Bind
-import org.jdbi.v3.sqlobject.kotlin.BindKotlin
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import uk.co.mutuallyassureddistraction.paketliga.dao.entity.Guess

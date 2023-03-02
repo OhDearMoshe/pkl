@@ -8,6 +8,7 @@ data class Game(val gameId: UUID,
                 val windowStart: ZonedDateTime,
                 val windowClose: ZonedDateTime,
                 val guessesClose: ZonedDateTime,
+                val deliveryTime: ZonedDateTime,
                 val userId: String,
                 val gameActive: Boolean
 )

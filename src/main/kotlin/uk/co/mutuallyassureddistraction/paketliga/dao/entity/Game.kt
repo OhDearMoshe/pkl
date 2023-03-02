@@ -6,7 +6,7 @@ import java.util.UUID
 data class Game(val gameId: UUID,
                 val gameName: String,
                 val windowStart: ZonedDateTime,
-                val windowCLoses: ZonedDateTime,
+                val windowClose: ZonedDateTime,
                 val guessesClose: ZonedDateTime,
                 val userId: String,
                 val gameActive: Boolean

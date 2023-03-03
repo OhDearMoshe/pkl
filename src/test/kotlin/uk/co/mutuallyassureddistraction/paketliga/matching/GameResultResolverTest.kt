@@ -42,7 +42,7 @@ class GameResultResolverTest {
     }
 
 
-    @DisplayName("findWinners() will find more than one guess if there is are two guesses either side of delivery time")
+    @DisplayName("findWinners() will find more than one guess if there is are two guesses of equal distance either side of delivery time")
     @Test
     fun guessesOfEqualDistanceBothReturned() {
         val closestGuessBefore = buildGuess("2023-03-03T20:52:00Z")
@@ -57,6 +57,21 @@ class GameResultResolverTest {
         assertEquals(2, results.size)
         assertEquals(closestGuessBefore, results[0])
         assertEquals(closestGuessAfter, results[1])
+    }
+
+    @DisplayName("findWinners() will return a guess that matches the delivery time")
+    @Test
+    fun guessThatMatchesDeliveryTimeIsReturned() {
+        val closestGuess = buildGuess("2023-03-03T21:00:00Z")
+        val guesses = listOf(
+            closestGuess,
+            buildGuess("2023-03-03T20:52:00Z"),
+            buildGuess("2023-03-03T20:50:00Z"),
+            buildGuess("2023-03-03T21:12:00Z")
+        )
+        val results = target.findWinners(buildGame(), guesses)
+        assertEquals(1, results.size)
+        assertEquals(closestGuess, results[0])
     }
 
     private fun buildGuess(guessTime: String): Guess {

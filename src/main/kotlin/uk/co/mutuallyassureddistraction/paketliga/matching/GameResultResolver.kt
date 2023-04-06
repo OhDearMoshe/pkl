@@ -5,6 +5,7 @@ import uk.co.mutuallyassureddistraction.paketliga.dao.entity.Guess
 import java.time.temporal.ChronoUnit
 import kotlin.math.absoluteValue
 
+@Suppress("MagicNumber")
 class GameResultResolver {
     fun findWinners(game: Game, guesses: List<Guess>): List<Guess> {
         var closestGuesses = mutableListOf<Guess>()

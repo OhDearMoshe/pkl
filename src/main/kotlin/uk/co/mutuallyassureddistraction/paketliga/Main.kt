@@ -14,7 +14,7 @@ suspend fun main() {
     val bot = ExtensibleBot(BOT_TOKEN) {
         chatCommands {
             enabled = true
-            prefix { default -> "?" }
+            prefix { _ -> "?" }
         }
 
         extensions {

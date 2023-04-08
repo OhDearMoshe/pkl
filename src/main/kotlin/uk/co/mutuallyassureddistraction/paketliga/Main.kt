@@ -3,6 +3,7 @@ package uk.co.mutuallyassureddistraction.paketliga
 import com.kotlindiscord.kord.extensions.ExtensibleBot
 import com.kotlindiscord.kord.extensions.utils.env
 import dev.kord.common.entity.Snowflake
+import uk.co.mutuallyassureddistraction.paketliga.extensions.GameExtension
 import uk.co.mutuallyassureddistraction.paketliga.extensions.SlapExtension
 
 val SERVER_ID = Snowflake(
@@ -18,7 +19,8 @@ suspend fun main() {
         }
 
         extensions {
-            add(::SlapExtension)
+//            add(::SlapExtension)
+            add(::GameExtension)
         }
     }
 

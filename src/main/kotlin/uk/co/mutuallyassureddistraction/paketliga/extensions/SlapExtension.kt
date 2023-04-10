@@ -4,7 +4,7 @@ import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.extensions.chatCommand
 import com.kotlindiscord.kord.extensions.utils.respond
 
-class SlapExtension() : Extension() {
+class SlapExtension : Extension() {
     override val name = "slapExtension"
 
     override suspend fun setup() {

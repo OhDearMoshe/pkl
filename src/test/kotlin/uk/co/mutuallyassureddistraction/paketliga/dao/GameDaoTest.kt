@@ -46,11 +46,10 @@ class GameDaoTest {
     }
 
     private fun createGame(): Game {
-        val gameId = UUID.randomUUID()
         val gameName = "A random game name for test";
 
         val expected = Game(
-            gameId = gameId,
+            gameId = 1,
             gameName = gameName,
             windowStart = ZonedDateTime.parse("2023-04-07T09:00:00.000Z[Europe/London]"),
             windowClose = ZonedDateTime.parse("2023-04-07T17:00:00.000Z[Europe/London]"),

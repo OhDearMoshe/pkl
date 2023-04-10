@@ -12,6 +12,7 @@ def jdbi_version = '3.37.1'
 
 // TEST
 def test_container_version = '1.17.6'
+def mockk_version = '1.13.4'
 
 
 repositories {
@@ -34,6 +35,7 @@ dependencies {
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
     testImplementation "org.testcontainers:testcontainers:$test_container_version"
     testImplementation "org.testcontainers:postgresql:$test_container_version"
+    testImplementation "io.mockk:mockk:$mockk_version"
 }
 
 test {

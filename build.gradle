@@ -1,5 +1,6 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.8.20'
+    id 'io.gitlab.arturbosch.detekt' version "1.22.0-RC2"
     id 'application'
 }
 
@@ -21,7 +22,7 @@ repositories {
 dependencies {
     implementation "io.insert-koin:koin-core:$koin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.8.20"
-
+    implementation "com.kotlindiscord.kord.extensions:kord-extensions:1.5.6"
 
     // Data Access
     implementation "org.jdbi:jdbi3-core:$jdbi_version"

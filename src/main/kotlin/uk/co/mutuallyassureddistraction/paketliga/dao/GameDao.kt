@@ -63,4 +63,11 @@ interface GameDao {
           AND gameActive = 'TRUE'
      """)
      fun findActiveGameById(@Bind("id")gameId: Int): Game
+
+     @SqlQuery("""
+          SELECT * FROM GAME
+          WHERE userId = :id
+          AND gameActive = 'TRUE'
+     """)
+     fun findActiveGamesByUserId(@Bind("id")useId: String): List<Game>
 }

@@ -64,6 +64,27 @@ class GameDaoTest {
         assertEquals(createdGame.windowStart, updatedGame.windowStart)
     }
 
+    @DisplayName("findActiveGamesByUserId() will return list of games by user id")
+    @Test
+    fun canSuccessfullyFindActiveGamesByUserId() {
+        val expected = Game(
+            gameId = 2,
+            gameName = "A second game",
+            windowStart = ZonedDateTime.parse("2023-04-10T10:00:00.000Z[Europe/London]"),
+            windowClose = ZonedDateTime.parse("2023-04-10T18:00:00.000Z[Europe/London]"),
+            guessesClose = ZonedDateTime.parse("2023-04-10T08:00:00.000Z[Europe/London]"),
+            deliveryTime = null,
+            userId = "Z",
+            gameActive = true
+        )
+        target.createGame(expected)
+
+        val games: List<Game> = target.findActiveGamesByUserId("Z")
+
+        assertEquals(games[0], createdGame)
+        assertEquals(games[1], expected)
+    }
+
     @DisplayName("finishGame() will successfully update the game deliveryTime and gameActive to false")
     @Test
     fun canSuccessfullyFinishGame() {

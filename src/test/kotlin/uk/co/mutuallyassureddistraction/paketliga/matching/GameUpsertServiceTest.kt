@@ -3,16 +3,25 @@ package uk.co.mutuallyassureddistraction.paketliga.matching
 import dev.kord.core.entity.Member
 import io.mockk.every
 import io.mockk.mockk
-import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
+import uk.co.mutuallyassureddistraction.paketliga.dao.GameDao
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class GameUpsertServiceTest {
-    private val target = GameUpsertService()
+
+    private lateinit var target: GameUpsertService
+
+    @BeforeEach
+    fun setUp() {
+        val gameDao = mockk<GameDao>()
+        every {gameDao.createGame(any())} returns Unit
+        target = GameUpsertService(gameDao)
+    }
 
     @DisplayName("createGame() will return string with gameName and member mentioned if both values are not null")
     @Test
@@ -44,11 +53,11 @@ class GameUpsertServiceTest {
 
         val gameName = userGameName ?: "Game"
 
-        if(member != null) {
-            return "$gameName by ${member.mention}" + " : package arriving between " + startTime + " and " + closeTime +
+        return if(member != null) {
+            "$gameName by ${member.mention}" + " : package arriving between " + startTime + " and " + closeTime +
                     ". Guesses accepted until " + guessesCloseTime
         } else {
-            return "$gameName by $username" + " : package arriving between " + startTime + " and " + closeTime +
+            "$gameName by $username" + " : package arriving between " + startTime + " and " + closeTime +
                     ". Guesses accepted until " + guessesCloseTime
         }
     }

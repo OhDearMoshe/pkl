@@ -6,10 +6,12 @@ import com.zoho.hawking.language.english.model.DatesFound
 import dev.kord.core.entity.Member
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
+import uk.co.mutuallyassureddistraction.paketliga.dao.GameDao
+import uk.co.mutuallyassureddistraction.paketliga.dao.entity.Game
 import java.time.ZoneId
 import java.util.*
 
-class GameUpsertService {
+class GameUpsertService(private val gameDao: GameDao) {
     fun createGame(userGameName: String?, startWindow: String, closeWindow: String, guessesClose: String,
                    userId: String, member: Member?, username: String): String {
         try {
@@ -21,7 +23,6 @@ class GameUpsertService {
             val startDates: DatesFound = parser.parse(startWindow, referenceDate, hawkingConfiguration, "eng")
             val closeDates: DatesFound = parser.parse(closeWindow, referenceDate, hawkingConfiguration, "eng")
             val guessesCloseDates: DatesFound = parser.parse(guessesClose, referenceDate, hawkingConfiguration, "eng")
-
 
             // Start or end doesn't matter if we only have one date at a time
             val startDate = startDates.parserOutputs[0].dateRange.start
@@ -36,7 +37,18 @@ class GameUpsertService {
             val closeDateString = closeDate.toString(dtf)
             val guessesCloseDateString = guessesCloseDate.toString(dtf)
 
-            // TODO GameDao connection? Actually saving the data?
+            gameDao.createGame(
+                Game(
+                    gameId = null,
+                    gameName = gameName,
+                    windowStart = startDate.toGregorianCalendar().toZonedDateTime(),
+                    windowClose = closeDate.toGregorianCalendar().toZonedDateTime(),
+                    guessesClose = guessesCloseDate.toGregorianCalendar().toZonedDateTime(),
+                    deliveryTime = null,
+                    userId = userId,
+                    gameActive = true
+                )
+            )
 
             return gameNameString + " : package arriving between " + startDateString + " and " + closeDateString +
                     ". Guesses accepted until " + guessesCloseDateString
@@ -47,12 +59,12 @@ class GameUpsertService {
     }
 
     private fun gameNameStringMaker(gameName: String?, member: Member?, username: String): String {
-        if(member != null) {
-            return "$gameName by ${member.mention}"
+        return if(member != null) {
+            "$gameName by ${member.mention}"
         } else {
             // We need username for non-server users that are using this command, if any (hence the nullable Member)
             // Kinda unlikely, but putting this here just in case
-            return "$gameName by $username"
+            "$gameName by $username"
         }
     }
 }

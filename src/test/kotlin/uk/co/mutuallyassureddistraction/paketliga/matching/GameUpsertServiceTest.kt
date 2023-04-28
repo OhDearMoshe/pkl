@@ -20,17 +20,17 @@ class GameUpsertServiceTest {
         val member = mockk<Member>()
         every {member.mention} returns "Z"
         val gameName = "Random Amazon package"
-        val returnedString = target.createGame(gameName, "2pm",
-            "7pm", "1pm", "1234", member, "ZLX")
+        val returnedString = target.createGame(gameName, "today 2pm",
+            "today 7pm", "today 1pm", "1234", member, "ZLX")
         val expectedString = getExpectedString(gameName, member, "ZLX")
-        assertEquals(returnedString, expectedString)
+        assertEquals(expectedString, returnedString)
     }
 
     @DisplayName("createGame() will return string with default 'Game' string and username if game name and member are null")
     @Test
     fun returnStringWithNullGameNameAndMember() {
-        val returnedString = target.createGame(null, "2pm",
-            "7pm", "1pm", "1234", null, "ZLX")
+        val returnedString = target.createGame(null, "today 2pm",
+            "today 7pm", "today 1pm", "1234", null, "ZLX")
         val expectedString = getExpectedString(null, null, "ZLX")
         assertEquals(returnedString, expectedString)
     }

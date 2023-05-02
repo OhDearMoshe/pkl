@@ -8,6 +8,7 @@ import uk.co.mutuallyassureddistraction.paketliga.dao.entity.Game
 import java.time.ZonedDateTime
 import java.util.*
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class GameDaoTest {
     private lateinit var target: GameDao
@@ -45,17 +46,22 @@ class GameDaoTest {
     @DisplayName("findActiveGameById() will successfully return a game by id")
     @Test
     fun canSuccessfullyFindActiveGameById() {
-        val searchedGame: Game = target.findActiveGameById(1)
+        val searchedGame: Game? = target.findActiveGameById(1)
         assertEquals(createdGame, searchedGame)
+    }
+
+    @DisplayName("findActiveGameById() will return null on unknown gameId")
+    @Test
+    fun getNullOnWrongGameIdInFindActiveGameById() {
+        val searchedGame: Game? = target.findActiveGameById(999)
+        assertNull(searchedGame)
     }
 
     @DisplayName("updateGameTimes() will successfully update the game time if not null")
     @Test
     fun canSuccessfullyUpdateGameTimes() {
-        target.updateGameTimes(1, null, null,
+        val updatedGame: Game = target.updateGameTimes(1, null, null,
             ZonedDateTime.parse("2023-04-07T13:00:00.000Z[Europe/London]"))
-
-        val updatedGame: Game = target.findActiveGameById(1)
         // Guesses close should be updated..
         assertEquals(updatedGame.guessesClose, ZonedDateTime.parse("2023-04-07T13:00:00.000Z[Europe/London]"))
 

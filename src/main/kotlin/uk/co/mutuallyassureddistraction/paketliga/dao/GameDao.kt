@@ -29,16 +29,18 @@ interface GameDao {
      """)
      fun createGame(game: Game)
 
-     @SqlUpdate("""
+     @SqlQuery("""
           UPDATE GAME
           SET 
                windowStart = COALESCE(:windowStart, windowStart),
                windowClose = COALESCE(:windowClose, windowClose),
                guessesClose = COALESCE(:guessesClose, windowClose)
           WHERE gameId = :id
+          RETURNING *
      """)
      fun updateGameTimes(@Bind("id")gameId: Int, @Bind("windowStart")windowStart: ZonedDateTime?,
-                         @Bind("windowClose")windowClose: ZonedDateTime?, @Bind("guessesClose")guessesClose: ZonedDateTime)
+                         @Bind("windowClose")windowClose: ZonedDateTime?,
+                         @Bind("guessesClose")guessesClose: ZonedDateTime?): Game
 
      @SqlQuery("""
           UPDATE Game
@@ -62,7 +64,7 @@ interface GameDao {
           WHERE gameId = :id
           AND gameActive = 'TRUE'
      """)
-     fun findActiveGameById(@Bind("id")gameId: Int): Game
+     fun findActiveGameById(@Bind("id")gameId: Int): Game?
 
      @SqlQuery("""
           SELECT * FROM GAME

@@ -6,17 +6,11 @@ import com.kotlindiscord.kord.extensions.commands.converters.impl.string
 import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.extensions.publicSlashCommand
 import com.kotlindiscord.kord.extensions.types.respond
-import com.kotlindiscord.kord.extensions.utils.env
 import dev.kord.common.entity.Snowflake
 import uk.co.mutuallyassureddistraction.paketliga.matching.GameUpsertService
 
-
-val SERVER_ID = Snowflake(
-    env("SERVER_ID").toLong()  // Get the test server ID from the env vars or a .env file
-)
-
-class GameExtension(private val gameUpsertService: GameUpsertService) : Extension() {
-    override val name = "gameExtension"
+class CreateGameExtension(private val gameUpsertService: GameUpsertService, private val serverId: Snowflake) : Extension() {
+    override val name = "createGameExtension"
 
     override suspend fun setup() {
         publicSlashCommand(::PaketGameArgs) {  // Public slash commands have public responses
@@ -24,7 +18,7 @@ class GameExtension(private val gameUpsertService: GameUpsertService) : Extensio
             description = "Ask the bot to create a game of PKL"
 
             // Use guild commands for testing, global ones take up to an hour to update
-            guild(SERVER_ID)
+            guild(serverId)
 
             action {
                 val createGameResponse = gameUpsertService.createGame(

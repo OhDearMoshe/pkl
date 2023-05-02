@@ -6,6 +6,7 @@ import com.kotlindiscord.kord.extensions.commands.converters.impl.optionalString
 import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.extensions.publicSlashCommand
 import com.kotlindiscord.kord.extensions.types.respond
+import com.kotlindiscord.kord.extensions.types.respondEphemeral
 import dev.kord.common.entity.Snowflake
 import uk.co.mutuallyassureddistraction.paketliga.matching.GameUpsertService
 
@@ -19,8 +20,23 @@ class UpdateGameExtension(private val gameUpsertService: GameUpsertService, priv
             guild(serverId)
 
             action {
-                respond {
-                    content = "game updated"
+                val gameId = arguments.gameid
+                val startWindow = arguments.startwindow
+                val closeWindow = arguments.closewindow
+                val guessesClose = arguments.guessesclose
+
+                if(startWindow == null || closeWindow == null || guessesClose == null) {
+                    respondEphemeral {
+                        content = "No time specified, the game will not be updated"
+                    }
+                } else {
+                    val updateGameResponse = gameUpsertService.updateGame(
+                        gameId, startWindow, closeWindow, guessesClose
+                    )
+
+                    respond {
+                        content = updateGameResponse[0]
+                    }
                 }
             }
         }

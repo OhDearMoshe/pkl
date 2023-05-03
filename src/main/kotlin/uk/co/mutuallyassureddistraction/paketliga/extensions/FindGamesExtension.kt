@@ -64,6 +64,9 @@ class FindGamesExtension(private val gameFinderService: GameFinderService, priva
                                     fields = pageFields
                                 }
                             }
+
+                            // This will make the pagination function (next prev etc) to disappear after timeout time
+                            timeoutSeconds = 15L
                         }
 
                         paginator.send()

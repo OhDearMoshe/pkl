@@ -54,13 +54,6 @@ interface GameDao {
 
      @SqlQuery("""
           SELECT * FROM GAME
-          WHERE gameName LIKE concat('%',:gameName,'%')
-          AND gameActive = 'TRUE'
-     """)
-     fun findActiveGameByName(gameName: String): Game
-
-     @SqlQuery("""
-          SELECT * FROM GAME
           WHERE gameId = :id
           AND gameActive = 'TRUE'
      """)
@@ -68,8 +61,9 @@ interface GameDao {
 
      @SqlQuery("""
           SELECT * FROM GAME
-          WHERE userId = :id
+          WHERE (:gameName IS NULL OR gameName LIKE concat('%',:gameName,'%'))
+          AND (:userId is NULL OR userId = :userId)
           AND gameActive = 'TRUE'
      """)
-     fun findActiveGamesByUserId(@Bind("id")useId: String): List<Game>
+     fun findActiveGames(gameName: String?, userId: String?): List<Game>
 }

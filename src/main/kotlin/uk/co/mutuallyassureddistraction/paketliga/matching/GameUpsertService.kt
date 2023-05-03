@@ -59,6 +59,7 @@ class GameUpsertService(private val gameDao: GameDao) {
                     ". Guesses accepted until " + guessesCloseDateString
         } catch (e: Exception) {
             // TODO logging
+            e.printStackTrace()
             return "An error has occurred, please re-check your inputs and try again"
         }
     }

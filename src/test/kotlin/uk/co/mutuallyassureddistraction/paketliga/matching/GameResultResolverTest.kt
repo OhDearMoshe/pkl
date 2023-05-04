@@ -76,8 +76,8 @@ class GameResultResolverTest {
 
     private fun buildGuess(guessTime: String): Guess {
         return Guess(
-            guessId = UUID.randomUUID(),
-            gameId = UUID.randomUUID(),
+            guessId = 1,
+            gameId = 1,
             userId = "PostMasterGeneral",
             guessTime = ZonedDateTime.parse(guessTime)
         )

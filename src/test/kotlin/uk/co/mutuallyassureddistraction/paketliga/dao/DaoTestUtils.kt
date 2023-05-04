@@ -35,15 +35,6 @@ fun setUpDatabaseTables(jdbi: Jdbi) {
     jdbi.withHandle<IntArray, Exception> {
         val batch: Batch = it.createBatch()
         batch.add("""
-            CREATE TABLE GUESS (
-               guessId SERIAL PRIMARY KEY,
-               gameId INT not null,
-               userId VARCHAR(50) not null,
-               guessTime TIMESTAMPTZ not null,
-               CONSTRAINT game_and_guess_time UNIQUE (gameId, guessTime)
-            )
-        """.trimIndent())
-        batch.add("""
             CREATE TABLE GAME (
                 gameId SERIAL PRIMARY KEY,
                 gameName VARCHAR(50) not null,
@@ -53,6 +44,19 @@ fun setUpDatabaseTables(jdbi: Jdbi) {
                 deliveryTime TIMESTAMPTZ null,
                 userId VARCHAR(50) not null,
                 gameActive BOOLEAN not null
+            )
+        """.trimIndent())
+        batch.add("""
+            CREATE TABLE GUESS (
+                guessId SERIAL PRIMARY KEY,
+                gameId INT not null,
+                userId VARCHAR(50) not null,
+                guessTime TIMESTAMPTZ not null,
+                CONSTRAINT fk_gameid
+                    FOREIGN KEY (gameId) 
+                        REFERENCES GAME(gameId)
+                        ON DELETE CASCADE,
+                CONSTRAINT game_and_guess_time UNIQUE (gameId, guessTime)
             )
         """.trimIndent())
         batch.execute()

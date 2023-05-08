@@ -12,6 +12,7 @@ import java.time.ZonedDateTime
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertTrue
 
 class GuessDaoTest {
     lateinit var gameDao: GameDao
@@ -147,5 +148,35 @@ class GuessDaoTest {
             assertIs<PSQLException>(original)
             assertEquals("ERRA1", original.sqlState)
         }
+    }
+
+    @DisplayName("findGuessesByGameId() will return a list of guesses")
+    @Test
+    fun canSuccessfullyFindGuessesGivenGameId() {
+        val expected = Guess(
+            guessId = 1,
+            gameId = 1,
+            userId = "PostMasterGeneral",
+            guessTime = ZonedDateTime.parse("2023-04-07T16:00:00.000Z[Europe/London]")
+        )
+        target.createGuess(expected)
+
+        val result = target.findGuessesByGameId(1)
+        assertEquals(result, listOf(expected))
+    }
+
+    @DisplayName("findGuessesByGameId() will return empty list on wrong game Id")
+    @Test
+    fun canSuccessfullyReturnEmptyListGivenWrongGameId() {
+        val expected = Guess(
+            guessId = 1,
+            gameId = 1,
+            userId = "PostMasterGeneral",
+            guessTime = ZonedDateTime.parse("2023-04-07T16:00:00.000Z[Europe/London]")
+        )
+        target.createGuess(expected)
+
+        val result = target.findGuessesByGameId(999)
+        assertTrue { result.isEmpty() }
     }
 }

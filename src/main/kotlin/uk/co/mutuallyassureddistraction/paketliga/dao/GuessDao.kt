@@ -31,4 +31,10 @@ interface GuessDao {
                 WHERE guessId = :id
     """)
     fun findGuessByGuessId(@Bind("id") guessId: Int): Guess
+
+    @SqlQuery("""
+        SELECT * FROM GUESS
+        WHERE gameId = :id
+    """)
+    fun findGuessesByGameId(@Bind("id") gameId: Int): List<Guess>
 }

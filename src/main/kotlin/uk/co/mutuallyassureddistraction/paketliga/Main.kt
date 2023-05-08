@@ -17,7 +17,7 @@ import uk.co.mutuallyassureddistraction.paketliga.extensions.GuessGameExtension
 import uk.co.mutuallyassureddistraction.paketliga.extensions.UpdateGameExtension
 import uk.co.mutuallyassureddistraction.paketliga.matching.GameFinderService
 import uk.co.mutuallyassureddistraction.paketliga.matching.GameUpsertService
-import uk.co.mutuallyassureddistraction.paketliga.matching.GuessService
+import uk.co.mutuallyassureddistraction.paketliga.matching.GuessUpsertService
 import java.sql.Connection
 import java.sql.DriverManager
 
@@ -40,12 +40,12 @@ suspend fun main() {
         val guessDao = jdbi.onDemand<GuessDao>()
         val gameUpsertService = GameUpsertService(gameDao)
         val gameFinderService = GameFinderService(gameDao)
-        val guessService = GuessService(guessDao)
+        val guessUpsertService = GuessUpsertService(guessDao)
 
         val createGameExtension = CreateGameExtension(gameUpsertService, SERVER_ID)
         val updateGameExtension = UpdateGameExtension(gameUpsertService, SERVER_ID)
         val findGamesExtension = FindGamesExtension(gameFinderService, SERVER_ID)
-        val guessGameExtension = GuessGameExtension(guessService, SERVER_ID)
+        val guessGameExtension = GuessGameExtension(guessUpsertService, SERVER_ID)
 
         val bot = ExtensibleBot(BOT_TOKEN) {
             chatCommands {

@@ -8,17 +8,17 @@ import uk.co.mutuallyassureddistraction.paketliga.dao.GuessDao
 import java.sql.SQLException
 import kotlin.test.*
 
-class GuessServiceTest {
-    private lateinit var target: GuessService
+class GuessUpsertServiceTest {
+    private lateinit var target: GuessUpsertService
 
     @DisplayName("guessGame() will create a guess successfully")
     @Test
     fun returnCreateGuessWithSuccessTrue() {
         val guessDao = mockk<GuessDao>()
         every {guessDao.createGuess(any())} returns Unit
-        target = GuessService(guessDao)
+        target = GuessUpsertService(guessDao)
 
-        val response: GuessService.GuessGameResponse = target.guessGame(1, "today 2PM", "Z")
+        val response: GuessUpsertService.GuessGameResponse = target.guessGame(1, "today 2PM", "Z")
         assertTrue { response.success }
         assertNull(response.failMessage)
         assertEquals(1, response.gameId)
@@ -31,9 +31,9 @@ class GuessServiceTest {
         val sqlException = SQLException("Guess time has already exist", "23505")
         val exception = UnableToExecuteStatementException(sqlException, null)
         every {guessDao.createGuess(any())} throws exception
-        target = GuessService(guessDao)
+        target = GuessUpsertService(guessDao)
 
-        val response: GuessService.GuessGameResponse = target.guessGame(2, "today 2PM", "Z")
+        val response: GuessUpsertService.GuessGameResponse = target.guessGame(2, "today 2PM", "Z")
         assertFalse { response.success }
         assertEquals("Guessing failed, there is already a guess with time today 2PM", response.failMessage)
         assertEquals(2, response.gameId)
@@ -46,9 +46,9 @@ class GuessServiceTest {
         val sqlException = SQLException("Game ID does not exist", "ERRA0")
         val exception = UnableToExecuteStatementException(sqlException, null)
         every {guessDao.createGuess(any())} throws exception
-        target = GuessService(guessDao)
+        target = GuessUpsertService(guessDao)
 
-        val response: GuessService.GuessGameResponse = target.guessGame(3, "today 2PM", "Z")
+        val response: GuessUpsertService.GuessGameResponse = target.guessGame(3, "today 2PM", "Z")
         assertFalse { response.success }
         assertEquals("Guessing failed, there is no active game with game ID #3", response.failMessage)
         assertEquals(3, response.gameId)
@@ -61,9 +61,9 @@ class GuessServiceTest {
         val sqlException = SQLException("Guess time is not between start and closing window range of the game", "ERRA1")
         val exception = UnableToExecuteStatementException(sqlException, null)
         every {guessDao.createGuess(any())} throws exception
-        target = GuessService(guessDao)
+        target = GuessUpsertService(guessDao)
 
-        val response: GuessService.GuessGameResponse = target.guessGame(4, "today 2PM", "Z")
+        val response: GuessUpsertService.GuessGameResponse = target.guessGame(4, "today 2PM", "Z")
         assertFalse { response.success }
         assertEquals("Guessing failed, guess time is not between start and closing window of game #4", response.failMessage)
         assertEquals(4, response.gameId)

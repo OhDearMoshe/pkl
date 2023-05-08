@@ -45,10 +45,10 @@ class GuessService(private val guessDao: GuessDao) {
                             errorString = "Guessing failed, there is already a guess with time $guessTime"
                         }
                         "ERRA0" -> {
-                            errorString = "Guessing failed, there is no active game with gameId $gameId"
+                            errorString = "Guessing failed, there is no active game with game ID #$gameId"
                         }
                         "ERRA1" -> {
-                            errorString = "Guessing failed, guess time is not between start and closing window of game $gameId"
+                            errorString = "Guessing failed, guess time is not between start and closing window of game #$gameId"
                         }
                     }
                 }

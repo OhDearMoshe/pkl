@@ -9,13 +9,11 @@ import java.util.*
 interface GuessDao {
     @SqlUpdate("""
             INSERT INTO GUESS(
-                guessId,
                 gameId,
                 userId,
                 guessTime
             )
             VALUES (
-                :guess.guessId,
                 :guess.gameId,
                 :guess.userId,
                 :guess.guessTime

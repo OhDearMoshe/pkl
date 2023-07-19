@@ -47,6 +47,23 @@ fun setUpDatabaseTables(jdbi: Jdbi) {
             )
         """.trimIndent())
         batch.add("""
+            CREATE OR REPLACE FUNCTION check_game_active_and_userid()
+            RETURNS TRIGGER AS ${'$'}${'$'}
+            BEGIN
+                IF NOT (NEW.deliverytime BETWEEN (SELECT windowstart FROM game WHERE gameid = NEW.gameid) AND (SELECT windowclose FROM game WHERE gameid = NEW.gameid)) THEN
+                    RAISE EXCEPTION 'Delivery time % is not between start and closing window range of the game', NEW.deliverytime USING ERRCODE = 'ERRG0';
+                END IF;
+                RETURN NEW;
+            END;
+            ${'$'}${'$'} LANGUAGE plpgsql;
+        """.trimIndent())
+        batch.add("""
+            CREATE TRIGGER check_game_active_and_userid_trigger
+            BEFORE UPDATE ON GAME
+            FOR EACH ROW
+            EXECUTE FUNCTION check_game_active_and_userid();
+        """.trimIndent())
+        batch.add("""
             CREATE TABLE GUESS (
                 guessId SERIAL PRIMARY KEY,
                 gameId INT not null,

@@ -1,13 +1,16 @@
 package uk.co.mutuallyassureddistraction.paketliga.dao
 
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.postgresql.util.PSQLException
 import uk.co.mutuallyassureddistraction.paketliga.dao.entity.Game
 import java.time.ZonedDateTime
 import java.util.*
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertNull
 
 class GameDaoTest {
@@ -66,6 +69,39 @@ class GameDaoTest {
     @DisplayName("finishGame() will successfully update the game deliveryTime and gameActive to false")
     @Test
     fun canSuccessfullyFinishGame() {
+        val finishedGame: Game = target.finishGame(1,
+            ZonedDateTime.parse("2023-04-07T16:37:00.000Z[Europe/London]"))
+
+        assertEquals(finishedGame.deliveryTime, ZonedDateTime.parse("2023-04-07T16:37:00.000Z[Europe/London]"))
+        assertEquals(finishedGame.gameActive, false)
+    }
+
+    @DisplayName("finishGame() will failed to update the game if delivery time is outside the window")
+    @Test
+    fun failToFinishGameWhenDeliveryTimeNotInRange() {
+
+        try {
+            target.finishGame(
+                1,
+                ZonedDateTime.parse("2023-04-07T20:37:00.000Z[Europe/London]")
+            )
+        } catch(e: UnableToExecuteStatementException) {
+            val original = e.cause
+            assertIs<PSQLException>(original)
+            assertEquals("ERRG0", original.sqlState)
+        }
+    }
+
+    @DisplayName("findActiveGames() with name will successfully return a game by name")
+    @Test
+    fun canSuccessfullyFindActiveGameByName() {
+        val searchedGame: List<Game> = target.findActiveGames("random", null)
+        assertEquals(createdGame, searchedGame[0])
+    }
+
+    @DisplayName("findActiveGame() with null params will successfully get all active games")
+    @Test
+    fun canSuccessfullyFindActiveGames() {
         val secondCreatedGame = Game(
             gameId = 2,
             gameName = "A second game",
@@ -82,24 +118,6 @@ class GameDaoTest {
 
         assertEquals(createdGame, games[0])
         assertEquals(secondCreatedGame, games[1])
-    }
-
-
-    @DisplayName("findActiveGames() with name will successfully return a game by name")
-    @Test
-    fun canSuccessfullyFindActiveGameByName() {
-        val searchedGame: List<Game> = target.findActiveGames("random", null)
-        assertEquals(createdGame, searchedGame[0])
-    }
-
-    @DisplayName("findActiveGame() with null params will successfully get all active games")
-    @Test
-    fun canSuccessfullyFindActiveGames() {
-        val finishedGame: Game = target.finishGame(1,
-            ZonedDateTime.parse("2023-04-07T16:37:00.000Z[Europe/London]"))
-
-        assertEquals(finishedGame.deliveryTime, ZonedDateTime.parse("2023-04-07T16:37:00.000Z[Europe/London]"))
-        assertEquals(finishedGame.gameActive, false)
     }
 
 

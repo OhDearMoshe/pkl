@@ -7,7 +7,6 @@ import uk.co.mutuallyassureddistraction.paketliga.dao.entity.Game
 interface GameDao {
      @SqlUpdate("""
           INSERT INTO GAME(
-               gameId,
                gameName,
                windowStart,
                windowClose,
@@ -17,7 +16,6 @@ interface GameDao {
                gameActive
           )
           VALUES (
-               :game.gameId,
                :game.gameName,
                :game.windowStart,
                :game.windowClose,

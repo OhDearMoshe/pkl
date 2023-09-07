@@ -85,7 +85,7 @@ class GameResultResolverTest {
 
     private fun buildGame(): Game {
         return Game(
-            gameId = UUID.randomUUID(),
+            gameId = 1,
             gameName = "Testing testing",
             windowStart = ZonedDateTime.now(),
             windowClose = ZonedDateTime.now(),

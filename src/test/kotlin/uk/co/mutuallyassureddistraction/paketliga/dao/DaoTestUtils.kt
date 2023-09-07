@@ -44,7 +44,7 @@ fun setUpDatabaseTables(jdbi: Jdbi) {
         """.trimIndent())
         batch.add("""
             CREATE TABLE GAME (
-                gameId uuid not null,
+                gameId SERIAL PRIMARY KEY,
                 gameName VARCHAR(50) not null,
                 windowStart VARCHAR(50) not null,
                 windowClose VARCHAR(50) not null,

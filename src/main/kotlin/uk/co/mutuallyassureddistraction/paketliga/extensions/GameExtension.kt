@@ -1,28 +1,21 @@
 package uk.co.mutuallyassureddistraction.paketliga.extensions
 
 import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.converters.impl.defaultingString
 import com.kotlindiscord.kord.extensions.commands.converters.impl.optionalString
 import com.kotlindiscord.kord.extensions.commands.converters.impl.string
 import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.extensions.publicSlashCommand
 import com.kotlindiscord.kord.extensions.types.respond
 import com.kotlindiscord.kord.extensions.utils.env
-import com.zoho.hawking.HawkingTimeParser
-import com.zoho.hawking.datetimeparser.configuration.HawkingConfiguration
-import com.zoho.hawking.language.english.model.DatesFound
 import dev.kord.common.entity.Snowflake
-import dev.kord.common.entity.optional.optional
 import uk.co.mutuallyassureddistraction.paketliga.matching.GameUpsertService
-import java.time.ZoneId
-import java.util.*
 
 
 val SERVER_ID = Snowflake(
     env("SERVER_ID").toLong()  // Get the test server ID from the env vars or a .env file
 )
 
-class GameExtension : Extension() {
+class GameExtension(private val gameUpsertService: GameUpsertService) : Extension() {
     override val name = "gameExtension"
 
     override suspend fun setup() {
@@ -34,8 +27,6 @@ class GameExtension : Extension() {
             guild(SERVER_ID)
 
             action {
-                val kord = this@GameExtension.kord
-                val gameUpsertService = GameUpsertService()
                 val createGameResponse = gameUpsertService.createGame(
                     arguments.gamename, arguments.startwindow, arguments.closewindow, arguments.guessesclose,
                     user.asUser().id.value.toString(), member?.asMember(), user.asUser().username

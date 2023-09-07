@@ -1,6 +1,8 @@
 package uk.co.mutuallyassureddistraction.paketliga.extensions
 
 import com.kotlindiscord.kord.extensions.commands.Arguments
+import com.kotlindiscord.kord.extensions.commands.converters.impl.defaultingString
+import com.kotlindiscord.kord.extensions.commands.converters.impl.optionalString
 import com.kotlindiscord.kord.extensions.commands.converters.impl.string
 import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.extensions.publicSlashCommand
@@ -10,6 +12,8 @@ import com.zoho.hawking.HawkingTimeParser
 import com.zoho.hawking.datetimeparser.configuration.HawkingConfiguration
 import com.zoho.hawking.language.english.model.DatesFound
 import dev.kord.common.entity.Snowflake
+import dev.kord.common.entity.optional.optional
+import uk.co.mutuallyassureddistraction.paketliga.matching.GameUpsertService
 import java.time.ZoneId
 import java.util.*
 
@@ -30,20 +34,15 @@ class GameExtension : Extension() {
             guild(SERVER_ID)
 
             action {
-                val parser = HawkingTimeParser()
-                val referenceDate = Date()
-                val hawkingConfiguration = HawkingConfiguration()
-                hawkingConfiguration.timeZone = ZoneId.systemDefault().toString()
-
-                val startDates : DatesFound = parser.parse(arguments.startwindow, referenceDate, hawkingConfiguration, "eng")
-                val closeDates : DatesFound = parser.parse(arguments.closewindow, referenceDate, hawkingConfiguration, "eng")
-
-                // Start or end doesn't matter if we only have one date at a time
-                val startDate = startDates.parserOutputs[0].dateRange.start
-                val closeDate = closeDates.parserOutputs[0].dateRange.start
+                val kord = this@GameExtension.kord
+                val gameUpsertService = GameUpsertService()
+                val createGameResponse = gameUpsertService.createGame(
+                    arguments.gamename, arguments.startwindow, arguments.closewindow, arguments.guessesclose,
+                    user.asUser().id.value.toString(), member?.asMember(), user.asUser().username
+                )
 
                 respond {
-                    content = "Okay, you've set up your time window from ${startDate.toString()} to ${closeDate.toString()}"
+                    content = createGameResponse
                 }
 
                 //TODO put the logic in try/catch and add logging?
@@ -56,6 +55,7 @@ class GameExtension : Extension() {
      * Planned arguments are similar to Game Entity:
      * from user input: startWindow, closeWindow, guessesClose, gameName (optional)
      * from impl: userId
+     * We're not using camelCase because currently it doesn't work (counted as coalesced string)
      */
     inner class PaketGameArgs : Arguments() {
         val startwindow by string {
@@ -66,6 +66,16 @@ class GameExtension : Extension() {
         val closewindow by string {
             name = "closewindow"
             description = "Close window time inputted by user"
+        }
+
+        val guessesclose by string {
+            name = "guessesclose"
+            description = "Close window time inputted by user"
+        }
+
+        val gamename by optionalString {
+            name = "gamename"
+            description = "Game name inputted by user"
         }
     }
 }

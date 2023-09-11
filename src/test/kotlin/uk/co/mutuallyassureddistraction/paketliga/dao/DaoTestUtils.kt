@@ -96,6 +96,33 @@ fun setUpDatabaseTables(jdbi: Jdbi) {
             FOR EACH ROW
             EXECUTE FUNCTION check_gameid_and_guesstime();
         """.trimIndent())
+        batch.add("""
+            CREATE TABLE WIN (
+                winId SERIAL PRIMARY KEY,
+                gameId INT not null UNIQUE,
+                guessId INT not null,
+                date TIMESTAMPTZ not null,
+                CONSTRAINT fk_gameid
+                    FOREIGN KEY (gameId) 
+                        REFERENCES GAME(gameId)
+                        ON DELETE CASCADE,
+                CONSTRAINT fk_guessid
+                    FOREIGN KEY (guessId)
+                        REFERENCES GUESS(guessId)
+                        ON DELETE CASCADE
+            )
+        """.trimIndent())
+        batch.add("""
+            CREATE TABLE POINT (
+                pointId SERIAL PRIMARY KEY,
+                userId VARCHAR(50) not null,
+                played INT not null,
+                won INT not null,
+                lost INT not null,
+                totalPoint INT not null,
+                CONSTRAINT unique_user_id UNIQUE (userId)
+            )
+        """.trimIndent())
         batch.execute()
     }
 }

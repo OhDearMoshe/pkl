@@ -8,6 +8,7 @@ import com.kotlindiscord.kord.extensions.extensions.publicSlashCommand
 import com.kotlindiscord.kord.extensions.types.respond
 import com.kotlindiscord.kord.extensions.types.respondEphemeral
 import dev.kord.common.entity.Snowflake
+import dev.kord.core.behavior.MemberBehavior
 import uk.co.mutuallyassureddistraction.paketliga.matching.GameUpsertService
 
 class UpdateGameExtension(private val gameUpsertService: GameUpsertService, private val serverId: Snowflake) : Extension() {
@@ -30,12 +31,25 @@ class UpdateGameExtension(private val gameUpsertService: GameUpsertService, priv
                         content = "No time specified, the game will not be updated"
                     }
                 } else {
-                    val updateGameResponse = gameUpsertService.updateGame(
+                    val (responseString, userIds) = gameUpsertService.updateGame(
                         gameId, startWindow, closeWindow, guessesClose
                     )
 
                     respond {
-                        content = updateGameResponse[0]
+                        content = responseString[0]
+                    }
+
+                    val kord = this@UpdateGameExtension.kord
+                    var mentionContent = "Mentioning users that have guessed:"
+                    userIds.forEach {
+                        val memberBehavior = MemberBehavior(serverId, Snowflake(it), kord)
+                        mentionContent += " " + memberBehavior.asMember().mention
+                    }
+
+                    mentionContent += " " + "as a notice that a game has been updated and possibly the time has changed"
+
+                    respond {
+                        content = mentionContent
                     }
                 }
             }

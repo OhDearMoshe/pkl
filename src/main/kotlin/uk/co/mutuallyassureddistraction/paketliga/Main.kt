@@ -36,10 +36,10 @@ suspend fun main() {
         // initialise GameDao and GameExtension
         val gameDao = jdbi.onDemand<GameDao>()
         val guessDao = jdbi.onDemand<GuessDao>()
-        val gameUpsertService = GameUpsertService(gameDao)
         val gameFinderService = GameFinderService(gameDao)
         val guessUpsertService = GuessUpsertService(guessDao)
         val guessFinderService = GuessFinderService(guessDao)
+        val gameUpsertService = GameUpsertService(gameDao, guessFinderService)
 
         val createGameExtension = CreateGameExtension(gameUpsertService, SERVER_ID)
         val updateGameExtension = UpdateGameExtension(gameUpsertService, SERVER_ID)

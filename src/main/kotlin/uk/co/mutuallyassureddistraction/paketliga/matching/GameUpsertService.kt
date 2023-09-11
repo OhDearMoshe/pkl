@@ -13,7 +13,7 @@ import uk.co.mutuallyassureddistraction.paketliga.dao.entity.Game
 import java.time.ZoneId
 import java.util.*
 
-class GameUpsertService(private val gameDao: GameDao) {
+class GameUpsertService(private val gameDao: GameDao, private val guessFinderService: GuessFinderService) {
 
     private val parser = HawkingTimeParser()
     private val referenceDate = Date()
@@ -64,10 +64,12 @@ class GameUpsertService(private val gameDao: GameDao) {
         }
     }
 
-    fun updateGame(gameId: Int, startWindow: String?, closeWindow: String?, guessesClose: String?): Array<String> {
+    fun updateGame(gameId: Int, startWindow: String?, closeWindow: String?, guessesClose: String?): Pair<Array<String>, List<String>> {
         try {
             gameDao.findActiveGameById(gameId)
-                ?: return arrayOf("Wrong Game ID, please check your gameId input and try again")
+                ?: return Pair(
+                    arrayOf("Wrong Game ID, please check your gameId input and try again"),
+                    arrayListOf(""))
 
             val startDates: DatesFound? = startWindow?.let { parseDate(startWindow) }
             val closeDates: DatesFound? = closeWindow?.let { parseDate(closeWindow) }
@@ -91,12 +93,18 @@ class GameUpsertService(private val gameDao: GameDao) {
 
             val gameUpdatedString: String = "Game #" + gameId + " updated: package now arriving between " + startDateString +
                     " and " + closeDateString + ". Guesses accepted until " + guessesCloseDateString
-            // TODO respond with member mentions by getting the user id from guesses?
-            return arrayOf(gameUpdatedString)
+
+            val guesses = guessFinderService.findGuesses(gameId, null)
+            val userIds = ArrayList<String>()
+            guesses.forEach {
+                userIds.add(it.userId)
+            }
+
+            return Pair(arrayOf(gameUpdatedString), userIds)
         } catch (e: Exception) {
             e.printStackTrace()
             // TODO logging
-            return arrayOf("An error has occurred, please re-check your inputs and try again")
+            return Pair(arrayOf("An error has occurred, please re-check your inputs and try again"), arrayListOf())
         }
     }
 

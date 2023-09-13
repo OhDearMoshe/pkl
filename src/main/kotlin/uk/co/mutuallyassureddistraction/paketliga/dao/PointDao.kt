@@ -22,6 +22,7 @@ interface PointDao {
         ON CONFLICT (userId) DO UPDATE
             SET 
                 totalPoint = pnt.totalPoint + 1,
+                played = pnt.played + 1,
                 won = pnt.won + 1
             WHERE pnt.userId = :point.userId
         RETURNING *
@@ -45,10 +46,7 @@ interface PointDao {
         )
         ON CONFLICT (userId) DO UPDATE
             SET 
-                totalPoint = CASE
-                    WHEN pnt.totalPoint = 0 THEN pnt.totalPoint
-                    ELSE pnt.totalPoint - 1
-                    END,
+                played = pnt.played + 1,
                 lost = pnt.lost + 1
             WHERE pnt.userId = :point.userId
         RETURNING *

@@ -11,7 +11,7 @@ import uk.co.mutuallyassureddistraction.paketliga.dao.entity.Guess
 import java.sql.SQLException
 import java.util.*
 
-class GuessService(private val guessDao: GuessDao) {
+class GuessUpsertService(private val guessDao: GuessDao) {
 
     private val parser = HawkingTimeParser()
     private val referenceDate = Date()

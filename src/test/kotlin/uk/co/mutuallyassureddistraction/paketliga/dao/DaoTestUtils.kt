@@ -99,7 +99,7 @@ fun setUpDatabaseTables(jdbi: Jdbi) {
         batch.add("""
             CREATE TABLE WIN (
                 winId SERIAL PRIMARY KEY,
-                gameId INT not null UNIQUE,
+                gameId INT not null,
                 guessId INT not null,
                 date TIMESTAMPTZ not null,
                 CONSTRAINT fk_gameid
@@ -109,7 +109,8 @@ fun setUpDatabaseTables(jdbi: Jdbi) {
                 CONSTRAINT fk_guessid
                     FOREIGN KEY (guessId)
                         REFERENCES GUESS(guessId)
-                        ON DELETE CASCADE
+                        ON DELETE CASCADE,
+                CONSTRAINT game_and_guess_unique UNIQUE (gameId, guessId)
             )
         """.trimIndent())
         batch.add("""

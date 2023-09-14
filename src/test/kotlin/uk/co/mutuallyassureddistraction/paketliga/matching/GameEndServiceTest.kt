@@ -21,11 +21,12 @@ class GameEndServiceTest {
     fun setUp() {
         val winningGuess = getWinningGuessStub()
         val losingGuess = getLosingGuessStub()
+        val searchedGame = getGameStub()
 
         val gameDao = mockk<GameDao>()
         every {gameDao.findActiveGameById(999)} returns null
-        every {gameDao.findActiveGameById(0)} returns mockk<Game>()
-        every {gameDao.finishGame(any(), any())} returns mockk<Game>()
+        every {gameDao.findActiveGameById(0)} returns searchedGame
+        every {gameDao.finishGame(any(), any())} returns searchedGame
 
         val guessDao = mockk<GuessDao>()
         every {guessDao.findGuessesByGameId(any())} returns arrayListOf(winningGuess, losingGuess)
@@ -51,13 +52,13 @@ class GameEndServiceTest {
         assert(returned.second.isEmpty())
     }
 
-    @DisplayName("endGame() will return null string and array of winners")
+    @DisplayName("endGame() will return null string and array of winning guesses")
     @Test
     fun returnNullStringWithWinners() {
         val returned = target.endGame(0, "earlier today 1pm")
         assertEquals(returned.first, null)
         assertEquals(returned.second.size, 1)
-        assertEquals(returned.second[0], "Z")
+        assertEquals(returned.second[0].userId, "Z")
     }
 
     private fun getWinningGuessStub(): Guess {
@@ -75,6 +76,19 @@ class GameEndServiceTest {
             gameId = 1,
             userId = "X",
             guessTime = ZonedDateTime.now().withHour(20).withMinute(38)
+        )
+    }
+
+    private fun getGameStub(): Game {
+        return Game(
+            gameId = 1,
+            gameName = "Testing testing",
+            windowStart = ZonedDateTime.now().withHour(15).withMinute(0),
+            windowClose = ZonedDateTime.now().withHour(19).withMinute(0),
+            guessesClose = ZonedDateTime.now().withHour(14).withMinute(0),
+            deliveryTime = null,
+            userId = "Z",
+            gameActive = true
         )
     }
 }

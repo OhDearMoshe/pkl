@@ -50,7 +50,7 @@ class GuessDaoTest {
             guessId = 1,
             gameId = 1,
             userId = "PostMasterGeneral",
-            guessTime = ZonedDateTime.parse("2023-03-01T22:51:20.123330Z[Europe/London]")
+            guessTime = ZonedDateTime.parse("2023-04-07T16:00:00.000Z[Europe/London]")
         )
         target.createGuess(expected)
 
@@ -73,7 +73,7 @@ class GuessDaoTest {
             guessId = 1,
             gameId = 1,
             userId = "PostMasterGeneral",
-            guessTime = ZonedDateTime.parse("2023-03-01T22:51:20.123330Z[Europe/London]")
+            guessTime = ZonedDateTime.parse("2023-04-07T16:00:00.000Z[Europe/London]")
         )
         target.createGuess(expected)
 
@@ -83,12 +83,12 @@ class GuessDaoTest {
 
     @DisplayName("createGuess() will fail to insert when no gameId found in the Game table")
     @Test
-    fun failToInsertOnGameIdForeignKeyConstraintViolation() {
+    fun failToInsertOnGameIdForeignKeyTriggerViolation() {
         val expectedOne = Guess(
             guessId = 1,
             gameId = 999,
             userId = "PostMasterGeneral",
-            guessTime = ZonedDateTime.parse("2023-03-01T22:51:20.123330Z[Europe/London]")
+            guessTime = ZonedDateTime.parse("2023-04-07T16:00:00.000Z[Europe/London]")
         )
 
         // SQLSTATE 23503: The insert or update value of a foreign key is invalid
@@ -97,7 +97,7 @@ class GuessDaoTest {
         } catch(e: UnableToExecuteStatementException) {
             val original = e.cause
             assertIs<PSQLException>(original)
-            assertEquals("23503", original.sqlState)
+            assertEquals("ERRA0", original.sqlState)
         }
     }
 
@@ -108,15 +108,15 @@ class GuessDaoTest {
             guessId = 1,
             gameId = 1,
             userId = "PostMasterGeneral",
-            guessTime = ZonedDateTime.parse("2023-03-01T22:51:20.123330Z[Europe/London]")
+            guessTime = ZonedDateTime.parse("2023-04-07T16:00:00.000Z[Europe/London]")
         )
         target.createGuess(expectedOne)
 
         val expectedTwo = Guess(
             guessId = 2,
             gameId = 1,
-            userId = "PostMasterGeneral",
-            guessTime = ZonedDateTime.parse("2023-03-01T22:51:20.123330Z[Europe/London]")
+            userId = "Z",
+            guessTime = ZonedDateTime.parse("2023-04-07T16:00:00.000Z[Europe/London]")
         )
 
         // SQLSTATE 23505:
@@ -127,6 +127,25 @@ class GuessDaoTest {
             val original = e.cause
             assertIs<PSQLException>(original)
             assertEquals("23505", original.sqlState)
+        }
+    }
+
+    @DisplayName("createGuess() will fail to insert when the guessTime is not between guess window range")
+    @Test
+    fun failToInsertOnGuessOutOfWindowRangeTriggerViolation() {
+        val expectedOne = Guess(
+            guessId = 1,
+            gameId = 1,
+            userId = "PostMasterGeneral",
+            guessTime = ZonedDateTime.parse("2023-04-07T20:00:00.000Z[Europe/London]")
+        )
+
+        try {
+            target.createGuess(expectedOne)
+        } catch(e: UnableToExecuteStatementException) {
+            val original = e.cause
+            assertIs<PSQLException>(original)
+            assertEquals("ERRA1", original.sqlState)
         }
     }
 }

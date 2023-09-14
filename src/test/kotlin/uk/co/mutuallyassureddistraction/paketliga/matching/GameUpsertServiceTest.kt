@@ -22,11 +22,23 @@ class GameUpsertServiceTest {
     @BeforeEach
     fun setUp() {
         val gameDao = mockk<GameDao>()
+        val guessFinderService = mockk<GuessFinderService>()
         every {gameDao.createGame(any())} returns Unit
         every {gameDao.findActiveGameById(999)} returns null
         every {gameDao.findActiveGameById(1)} returns mockk<Game>()
         every {gameDao.updateGameTimes(any(), any(), any(), any())} returns getUpdatedGameStub()
-        target = GameUpsertService(gameDao)
+
+        val guessesResponse = arrayListOf(
+            GuessFinderService.FindGuessesResponse (
+                guessId = 1,
+                gameId = 1,
+                userId = "Z",
+                guessTime = "\"2023-04-10T10:00:00.000Z[Europe/London]"
+            )
+        )
+        every {guessFinderService.findGuesses(any(), any())} returns guessesResponse
+
+        target = GameUpsertService(gameDao, guessFinderService)
         dtf = DateTimeFormat.forPattern("dd-MMM-yy HH:mm")
     }
 
@@ -56,9 +68,9 @@ class GameUpsertServiceTest {
     fun returnStringWithWrongGameIDInformation() {
         target.createGame(null, "today 2pm",
             "today 7pm", "today 1pm", "1234", null, "ZLX")
-        val returnedString = target.updateGame(999, null, null, null)
+        val (updateString, _) = target.updateGame(999, null, null, null)
         val expectedString = "Wrong Game ID, please check your gameId input and try again"
-        assertEquals(returnedString[0], expectedString)
+        assertEquals(updateString[0], expectedString)
     }
 
     @DisplayName("updateGame() will return updated game string")
@@ -66,14 +78,24 @@ class GameUpsertServiceTest {
     fun returnStringWithUpdatedGameInfo() {
         target.createGame(null, "today 2pm",
             "today 7pm", "today 1pm", "1234", null, "ZLX")
-        val returnedString = target.updateGame(1, "today 3 pm", null, "today 2 pm")
+        val (updateString, _) = target.updateGame(1, "today 3 pm", null, "today 2 pm")
 
         val startTime = LocalDateTime.now().withHourOfDay(15).withMinuteOfHour(0).toString(dtf)
         val closeTime = LocalDateTime.now().withHourOfDay(19).withMinuteOfHour(0).toString(dtf)
         val guessesCloseTime = LocalDateTime.now().withHourOfDay(14).withMinuteOfHour(0).toString(dtf)
         val expectedString = "Game #1 updated: package now arriving between " + startTime +
                 " and " + closeTime + ". Guesses accepted until " + guessesCloseTime
-        assertEquals(returnedString[0], expectedString)
+        assertEquals(updateString[0], expectedString)
+    }
+
+    @DisplayName("updateGame() will return userIds")
+    @Test
+    fun returnStringWithUserIds() {
+        target.createGame(null, "today 2pm",
+            "today 7pm", "today 1pm", "1234", null, "ZLX")
+        val (_, userIds) = target.updateGame(1, "today 3 pm", null, "today 2 pm")
+
+        assertEquals(userIds[0], "Z")
     }
 
     private fun getUpdatedGameStub(): Game {

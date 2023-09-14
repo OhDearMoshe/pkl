@@ -50,7 +50,7 @@ class GuessServiceTest {
 
         val response: GuessService.GuessGameResponse = target.guessGame(3, "today 2PM", "Z")
         assertFalse { response.success }
-        assertEquals("Guessing failed, there is no active game with gameId 3", response.failMessage)
+        assertEquals("Guessing failed, there is no active game with game ID #3", response.failMessage)
         assertEquals(3, response.gameId)
     }
 
@@ -65,7 +65,7 @@ class GuessServiceTest {
 
         val response: GuessService.GuessGameResponse = target.guessGame(4, "today 2PM", "Z")
         assertFalse { response.success }
-        assertEquals("Guessing failed, guess time is not between start and closing window of game 4", response.failMessage)
+        assertEquals("Guessing failed, guess time is not between start and closing window of game #4", response.failMessage)
         assertEquals(4, response.gameId)
     }
 }

@@ -43,6 +43,7 @@ suspend fun main() {
         val gameUpsertService = GameUpsertService(gameDao, guessFinderService)
         val gameResultResolver = GameResultResolver()
         val gameEndService = GameEndService(guessDao, gameDao, pointDao, winDao, gameResultResolver)
+        val leaderboardService = LeaderboardService(pointDao)
 
         val createGameExtension = CreateGameExtension(gameUpsertService, SERVER_ID)
         val updateGameExtension = UpdateGameExtension(gameUpsertService, SERVER_ID)
@@ -50,6 +51,7 @@ suspend fun main() {
         val guessGameExtension = GuessGameExtension(guessUpsertService, SERVER_ID)
         val findGuessExtension = FindGuessExtension(guessFinderService, SERVER_ID)
         val endGameExtension = EndGameExtension(gameEndService, SERVER_ID)
+        val leaderboardExtension = LeaderboardExtension(leaderboardService, SERVER_ID)
 
         val bot = ExtensibleBot(BOT_TOKEN) {
             chatCommands {
@@ -64,6 +66,7 @@ suspend fun main() {
                 add { guessGameExtension }
                 add { findGuessExtension }
                 add { endGameExtension }
+                add { leaderboardExtension }
             }
         }
 

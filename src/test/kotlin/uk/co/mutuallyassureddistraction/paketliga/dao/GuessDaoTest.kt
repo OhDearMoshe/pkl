@@ -1,21 +1,40 @@
 package uk.co.mutuallyassureddistraction.paketliga.dao
 
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.postgresql.util.PSQLException
+import uk.co.mutuallyassureddistraction.paketliga.dao.entity.Game
 import uk.co.mutuallyassureddistraction.paketliga.dao.entity.Guess
 import java.time.ZonedDateTime
 import java.util.*
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 
 class GuessDaoTest {
+    lateinit var gameDao: GameDao
     lateinit var target: GuessDao
     lateinit var testWrapper: DaoTestWrapper
 
     @BeforeEach
     fun setUp() {
         testWrapper = initTests()
+        gameDao = testWrapper.buildDao(GameDao::class.java)
+        gameDao.createGame(
+            Game(
+                gameId = 1,
+                gameName = "random game name",
+                windowStart = ZonedDateTime.parse("2023-04-07T09:00:00.000Z[Europe/London]"),
+                windowClose = ZonedDateTime.parse("2023-04-07T17:00:00.000Z[Europe/London]"),
+                guessesClose = ZonedDateTime.parse("2023-04-07T12:00:00.000Z[Europe/London]"),
+                deliveryTime = null,
+                userId = "Z",
+                gameActive = true
+            )
+        )
+
         target = testWrapper.buildDao(GuessDao::class.java)
     }
 
@@ -27,11 +46,9 @@ class GuessDaoTest {
     @DisplayName("createGuess() will successfully inset guess into table")
     @Test
     fun canSuccessfullyInsertIntoTable() {
-        val guessId = UUID.randomUUID()
-        val gameId = UUID.randomUUID()
         val expected = Guess(
-            guessId = guessId,
-            gameId = gameId,
+            guessId = 1,
+            gameId = 1,
             userId = "PostMasterGeneral",
             guessTime = ZonedDateTime.parse("2023-03-01T22:51:20.123330Z[Europe/London]")
         )
@@ -52,19 +69,64 @@ class GuessDaoTest {
     @DisplayName("findGuessByGuessId() will successfully return a guess found by id")
     @Test
     fun canSuccessfullyReadyFromTableByGuessId() {
-        val guessId = UUID.randomUUID()
-        val gameId = UUID.randomUUID()
         val expected = Guess(
-            guessId = guessId,
-            gameId = gameId,
+            guessId = 1,
+            gameId = 1,
             userId = "PostMasterGeneral",
             guessTime = ZonedDateTime.parse("2023-03-01T22:51:20.123330Z[Europe/London]")
         )
         target.createGuess(expected)
 
-        val result = target.findGuessByGuessId(guessId)
+        val result = target.findGuessByGuessId(1)
         assertEquals(result, expected)
     }
 
+    @DisplayName("createGuess() will fail to insert when no gameId found in the Game table")
+    @Test
+    fun failToInsertOnGameIdForeignKeyConstraintViolation() {
+        val expectedOne = Guess(
+            guessId = 1,
+            gameId = 999,
+            userId = "PostMasterGeneral",
+            guessTime = ZonedDateTime.parse("2023-03-01T22:51:20.123330Z[Europe/London]")
+        )
 
+        // SQLSTATE 23503: The insert or update value of a foreign key is invalid
+        try {
+            target.createGuess(expectedOne)
+        } catch(e: UnableToExecuteStatementException) {
+            val original = e.cause
+            assertIs<PSQLException>(original)
+            assertEquals("23503", original.sqlState)
+        }
+    }
+
+    @DisplayName("createGuess() will fail to insert on non-unique guess")
+    @Test
+    fun failToInsertOnGuessTimeConstraintViolation() {
+        val expectedOne = Guess(
+            guessId = 1,
+            gameId = 1,
+            userId = "PostMasterGeneral",
+            guessTime = ZonedDateTime.parse("2023-03-01T22:51:20.123330Z[Europe/London]")
+        )
+        target.createGuess(expectedOne)
+
+        val expectedTwo = Guess(
+            guessId = 2,
+            gameId = 1,
+            userId = "PostMasterGeneral",
+            guessTime = ZonedDateTime.parse("2023-03-01T22:51:20.123330Z[Europe/London]")
+        )
+
+        // SQLSTATE 23505:
+        // A violation of the constraint imposed by a unique index or a unique constraint occurred.
+        try {
+            target.createGuess(expectedTwo)
+        } catch(e: UnableToExecuteStatementException) {
+            val original = e.cause
+            assertIs<PSQLException>(original)
+            assertEquals("23505", original.sqlState)
+        }
+    }
 }

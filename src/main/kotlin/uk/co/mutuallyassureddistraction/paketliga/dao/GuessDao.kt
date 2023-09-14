@@ -32,5 +32,5 @@ interface GuessDao {
                 FROM GUESS
                 WHERE guessId = :id
     """)
-    fun findGuessByGuessId(@Bind("id") guessId: UUID): Guess
+    fun findGuessByGuessId(@Bind("id") guessId: Int): Guess
 }

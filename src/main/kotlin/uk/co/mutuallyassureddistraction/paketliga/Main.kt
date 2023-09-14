@@ -11,7 +11,9 @@ import org.jdbi.v3.sqlobject.kotlin.KotlinSqlObjectPlugin
 import org.jdbi.v3.sqlobject.kotlin.onDemand
 import uk.co.mutuallyassureddistraction.paketliga.dao.GameDao
 import uk.co.mutuallyassureddistraction.paketliga.extensions.CreateGameExtension
+import uk.co.mutuallyassureddistraction.paketliga.extensions.FindGamesExtension
 import uk.co.mutuallyassureddistraction.paketliga.extensions.UpdateGameExtension
+import uk.co.mutuallyassureddistraction.paketliga.matching.GameFinderService
 import uk.co.mutuallyassureddistraction.paketliga.matching.GameUpsertService
 import java.sql.Connection
 import java.sql.DriverManager
@@ -33,9 +35,11 @@ suspend fun main() {
         // initialise GameDao and GameExtension
         val gameDao = jdbi.onDemand<GameDao>()
         val gameUpsertService = GameUpsertService(gameDao)
+        val gameFinderService = GameFinderService(gameDao)
 
         val createGameExtension = CreateGameExtension(gameUpsertService, SERVER_ID)
         val updateGameExtension = UpdateGameExtension(gameUpsertService, SERVER_ID)
+        val findGamesExtension = FindGamesExtension(gameFinderService, SERVER_ID)
 
         val bot = ExtensibleBot(BOT_TOKEN) {
             chatCommands {
@@ -46,6 +50,7 @@ suspend fun main() {
             extensions {
                 add { createGameExtension }
                 add { updateGameExtension }
+                add { findGamesExtension }
             }
         }
 

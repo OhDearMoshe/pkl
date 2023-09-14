@@ -11,11 +11,10 @@ import org.jdbi.v3.sqlobject.kotlin.KotlinSqlObjectPlugin
 import org.jdbi.v3.sqlobject.kotlin.onDemand
 import uk.co.mutuallyassureddistraction.paketliga.dao.GameDao
 import uk.co.mutuallyassureddistraction.paketliga.dao.GuessDao
+import uk.co.mutuallyassureddistraction.paketliga.dao.PointDao
+import uk.co.mutuallyassureddistraction.paketliga.dao.WinDao
 import uk.co.mutuallyassureddistraction.paketliga.extensions.*
-import uk.co.mutuallyassureddistraction.paketliga.matching.GameFinderService
-import uk.co.mutuallyassureddistraction.paketliga.matching.GameUpsertService
-import uk.co.mutuallyassureddistraction.paketliga.matching.GuessFinderService
-import uk.co.mutuallyassureddistraction.paketliga.matching.GuessUpsertService
+import uk.co.mutuallyassureddistraction.paketliga.matching.*
 import java.sql.Connection
 import java.sql.DriverManager
 
@@ -36,16 +35,21 @@ suspend fun main() {
         // initialise GameDao and GameExtension
         val gameDao = jdbi.onDemand<GameDao>()
         val guessDao = jdbi.onDemand<GuessDao>()
+        val pointDao = jdbi.onDemand<PointDao>()
+        val winDao = jdbi.onDemand<WinDao>()
         val gameFinderService = GameFinderService(gameDao)
         val guessUpsertService = GuessUpsertService(guessDao)
         val guessFinderService = GuessFinderService(guessDao)
         val gameUpsertService = GameUpsertService(gameDao, guessFinderService)
+        val gameResultResolver = GameResultResolver()
+        val gameEndService = GameEndService(guessDao, gameDao, pointDao, winDao, gameResultResolver)
 
         val createGameExtension = CreateGameExtension(gameUpsertService, SERVER_ID)
         val updateGameExtension = UpdateGameExtension(gameUpsertService, SERVER_ID)
         val findGamesExtension = FindGamesExtension(gameFinderService, SERVER_ID)
         val guessGameExtension = GuessGameExtension(guessUpsertService, SERVER_ID)
         val findGuessExtension = FindGuessExtension(guessFinderService, SERVER_ID)
+        val endGameExtension = EndGameExtension(gameEndService, SERVER_ID)
 
         val bot = ExtensibleBot(BOT_TOKEN) {
             chatCommands {
@@ -59,6 +63,7 @@ suspend fun main() {
                 add { findGamesExtension }
                 add { guessGameExtension }
                 add { findGuessExtension }
+                add { endGameExtension }
             }
         }
 

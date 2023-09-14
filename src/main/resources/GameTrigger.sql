@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION check_game_active_and_userid()
 RETURNS TRIGGER AS $$
 BEGIN
     IF NOT (NEW.deliverytime BETWEEN (SELECT windowstart FROM game WHERE gameid = NEW.gameid) AND (SELECT windowclose FROM game WHERE gameid = NEW.gameid)) THEN
-        RAISE EXCEPTION 'Delivery time % is not between start and closing window range of the game', NEW.deliverytime USING ERRCODE = 'ERRG0';
+        RAISE EXCEPTION 'Delivery time % is not between start and closing window range of the game ( % and % )', NEW.deliverytime, OLD.windowstart, OLD.windowclose USING ERRCODE = 'ERRG0';
     END IF;
     RETURN NEW;
 END;

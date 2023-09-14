@@ -7,6 +7,7 @@ import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.extensions.publicSlashCommand
 import com.kotlindiscord.kord.extensions.types.respond
 import com.kotlindiscord.kord.extensions.types.respondEphemeral
+import com.kotlindiscord.kord.extensions.types.respondingPaginator
 import dev.kord.common.entity.Snowflake
 import uk.co.mutuallyassureddistraction.paketliga.matching.GameUpsertService
 
@@ -36,6 +37,10 @@ class UpdateGameExtension(private val gameUpsertService: GameUpsertService, priv
 
                     respond {
                         content = updateGameResponse[0]
+                    }
+
+                    respondingPaginator {
+
                     }
                 }
             }

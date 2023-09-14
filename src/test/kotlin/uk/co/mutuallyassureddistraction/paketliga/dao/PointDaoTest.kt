@@ -82,6 +82,29 @@ class PointDaoTest {
         assertEquals(secondResult.lost, 2)
     }
 
+    @DisplayName("getPointsSortedByTotalPointsDesc() will return all points sorted descending")
+    @Test
+    fun canSuccessfullyGetPointsDescFromTable() {
+        target.addWin(Point(1,"Z",1,1,1,1))
+        target.addWin(Point(2,"Y",1,1,1,3))
+        target.addWin(Point(3,"X",1,1,1,2))
+        val points = target.getPointsSortedByTotalPointsDesc()
+        assertEquals(points[0].userId, "Y")
+        assertEquals(points[1].userId, "X")
+        assertEquals(points[2].userId, "Z")
+        assertEquals(points[0].totalPoint, 3)
+        assertEquals(points[1].totalPoint, 2)
+        assertEquals(points[2].totalPoint, 1)
+    }
+
+    @DisplayName("getPointByUserId() will return point by user id")
+    @Test
+    fun canSuccessfullyGetPointByUserId() {
+        target.addWin(Point(1, "Z", 1, 1, 1, 1))
+        val point = target.getPointByUserId("Z")
+        assertEquals(point.userId, "Z")
+    }
+
     private fun createdPoint(): Point {
         return Point(
             pointId = 1,

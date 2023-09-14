@@ -36,6 +36,7 @@ class PointDaoTest {
         )
         assertEquals(firstResult.userId, expected.userId)
         assertEquals(firstResult.totalPoint, 1)
+        assertEquals(firstResult.played, 1)
         assertEquals(firstResult.won, 1)
 
         target.addWin(expected)
@@ -44,6 +45,7 @@ class PointDaoTest {
         )
         assertEquals(secondResult.userId, expected.userId)
         assertEquals(secondResult.totalPoint, 2)
+        assertEquals(secondResult.played, 2)
         assertEquals(secondResult.won, 2)
     }
 
@@ -67,6 +69,7 @@ class PointDaoTest {
         )
         assertEquals(firstResult.userId, expected.userId)
         assertEquals(firstResult.totalPoint, 1)
+        assertEquals(firstResult.played, 1)
         assertEquals(firstResult.lost, 1)
 
         target.addLost(expected)
@@ -74,16 +77,9 @@ class PointDaoTest {
             """SELECT * FROM POINT""".trimIndent()
         )
         assertEquals(secondResult.userId, expected.userId)
-        assertEquals(secondResult.totalPoint, 0)
+        assertEquals(secondResult.totalPoint, 1)
+        assertEquals(secondResult.played, 2)
         assertEquals(secondResult.lost, 2)
-
-        target.addLost(expected)
-        val thirdResult = testWrapper.executeSimpleQuery<Point>(
-            """SELECT * FROM POINT""".trimIndent()
-        )
-        assertEquals(thirdResult.userId, expected.userId)
-        assertEquals(thirdResult.totalPoint, 0)
-        assertEquals(thirdResult.lost, 3)
     }
 
     private fun createdPoint(): Point {

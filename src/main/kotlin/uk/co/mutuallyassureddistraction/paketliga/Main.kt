@@ -10,11 +10,14 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin
 import org.jdbi.v3.sqlobject.kotlin.KotlinSqlObjectPlugin
 import org.jdbi.v3.sqlobject.kotlin.onDemand
 import uk.co.mutuallyassureddistraction.paketliga.dao.GameDao
+import uk.co.mutuallyassureddistraction.paketliga.dao.GuessDao
 import uk.co.mutuallyassureddistraction.paketliga.extensions.CreateGameExtension
 import uk.co.mutuallyassureddistraction.paketliga.extensions.FindGamesExtension
+import uk.co.mutuallyassureddistraction.paketliga.extensions.GuessGameExtension
 import uk.co.mutuallyassureddistraction.paketliga.extensions.UpdateGameExtension
 import uk.co.mutuallyassureddistraction.paketliga.matching.GameFinderService
 import uk.co.mutuallyassureddistraction.paketliga.matching.GameUpsertService
+import uk.co.mutuallyassureddistraction.paketliga.matching.GuessService
 import java.sql.Connection
 import java.sql.DriverManager
 
@@ -34,12 +37,15 @@ suspend fun main() {
 
         // initialise GameDao and GameExtension
         val gameDao = jdbi.onDemand<GameDao>()
+        val guessDao = jdbi.onDemand<GuessDao>()
         val gameUpsertService = GameUpsertService(gameDao)
         val gameFinderService = GameFinderService(gameDao)
+        val guessService = GuessService(guessDao)
 
         val createGameExtension = CreateGameExtension(gameUpsertService, SERVER_ID)
         val updateGameExtension = UpdateGameExtension(gameUpsertService, SERVER_ID)
         val findGamesExtension = FindGamesExtension(gameFinderService, SERVER_ID)
+        val guessGameExtension = GuessGameExtension(guessService, SERVER_ID)
 
         val bot = ExtensibleBot(BOT_TOKEN) {
             chatCommands {
@@ -51,6 +57,7 @@ suspend fun main() {
                 add { createGameExtension }
                 add { updateGameExtension }
                 add { findGamesExtension }
+                add { guessGameExtension }
             }
         }
 

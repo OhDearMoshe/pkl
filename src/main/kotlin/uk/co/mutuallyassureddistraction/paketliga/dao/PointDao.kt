@@ -1,5 +1,6 @@
 package uk.co.mutuallyassureddistraction.paketliga.dao
 
+import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import uk.co.mutuallyassureddistraction.paketliga.dao.entity.Point
 
@@ -52,4 +53,16 @@ interface PointDao {
         RETURNING *
     """)
     fun addLost(point: Point)
+
+    @SqlQuery("""
+        SELECT * FROM POINT
+        ORDER BY totalPoint DESC;
+    """)
+    fun getPointsSortedByTotalPointsDesc(): List<Point>
+
+    @SqlQuery("""
+        SELECT * FROM POINT
+        WHERE userId = :userId
+    """)
+    fun getPointByUserId(userId: String): Point
 }

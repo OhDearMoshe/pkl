@@ -39,17 +39,19 @@ class UpdateGameExtension(private val gameUpsertService: GameUpsertService, priv
                         content = responseString[0]
                     }
 
-                    val kord = this@UpdateGameExtension.kord
-                    var mentionContent = "Mentioning users that have guessed:"
-                    userIds.forEach {
-                        val memberBehavior = MemberBehavior(serverId, Snowflake(it), kord)
-                        mentionContent += " " + memberBehavior.asMember().mention
-                    }
+                    if(userIds.isNotEmpty()) {
+                        val kord = this@UpdateGameExtension.kord
+                        var mentionContent = "Mentioning users that have guessed:"
+                        userIds.forEach {
+                            val memberBehavior = MemberBehavior(serverId, Snowflake(it), kord)
+                            mentionContent += " " + memberBehavior.asMember().mention
+                        }
 
-                    mentionContent += " " + "as a notice that a game has been updated and possibly the time has changed"
+                        mentionContent += " " + "as a notice that a game has been updated and possibly the time has changed"
 
-                    respond {
-                        content = mentionContent
+                        respond {
+                            content = mentionContent
+                        }
                     }
                 }
             }

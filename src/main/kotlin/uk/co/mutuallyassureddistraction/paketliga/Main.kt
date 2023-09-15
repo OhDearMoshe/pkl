@@ -38,7 +38,7 @@ suspend fun main() {
         val pointDao = jdbi.onDemand<PointDao>()
         val winDao = jdbi.onDemand<WinDao>()
         val gameFinderService = GameFinderService(gameDao)
-        val guessUpsertService = GuessUpsertService(guessDao)
+        val guessUpsertService = GuessUpsertService(guessDao, gameDao)
         val guessFinderService = GuessFinderService(guessDao)
         val gameUpsertService = GameUpsertService(gameDao, guessFinderService)
         val gameResultResolver = GameResultResolver()

@@ -73,7 +73,8 @@ fun setUpDatabaseTables(jdbi: Jdbi) {
                     FOREIGN KEY (gameId) 
                         REFERENCES GAME(gameId)
                         ON DELETE CASCADE,
-                CONSTRAINT game_and_guess_time UNIQUE (gameId, guessTime)
+                CONSTRAINT game_and_guess_time UNIQUE (gameId, guessTime),
+                CONSTRAINT game_and_user_id UNIQUE (gameId, userId)
             )
         """.trimIndent())
         batch.add("""

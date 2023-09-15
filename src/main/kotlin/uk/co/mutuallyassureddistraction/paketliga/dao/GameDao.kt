@@ -2,12 +2,11 @@ package uk.co.mutuallyassureddistraction.paketliga.dao
 
 import org.jdbi.v3.sqlobject.customizer.Bind
 import org.jdbi.v3.sqlobject.statement.SqlQuery
-import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import uk.co.mutuallyassureddistraction.paketliga.dao.entity.Game
 import java.time.ZonedDateTime
 
 interface GameDao {
-     @SqlUpdate("""
+     @SqlQuery("""
           INSERT INTO GAME(
                gameName,
                windowStart,
@@ -26,8 +25,9 @@ interface GameDao {
                :game.userId,
                :game.gameActive
           )
+          RETURNING *
      """)
-     fun createGame(game: Game)
+     fun createGame(game: Game): Game
 
      @SqlQuery("""
           UPDATE GAME

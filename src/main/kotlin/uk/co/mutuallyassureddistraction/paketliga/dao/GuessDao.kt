@@ -8,7 +8,7 @@ import java.util.*
 
 interface GuessDao {
     @SqlUpdate("""
-            INSERT INTO GUESS(
+            INSERT INTO GUESS as gss(
                 gameId,
                 userId,
                 guessTime
@@ -17,7 +17,11 @@ interface GuessDao {
                 :guess.gameId,
                 :guess.userId,
                 :guess.guessTime
-            )
+            ) 
+            ON CONFLICT ON CONSTRAINT game_and_user_id DO UPDATE
+                SET 
+                    guessTime = :guess.guessTime
+                WHERE gss.userId = :guess.userId
         """)
     fun createGuess(guess: Guess)
 

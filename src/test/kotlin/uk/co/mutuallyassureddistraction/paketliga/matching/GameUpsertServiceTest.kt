@@ -23,7 +23,7 @@ class GameUpsertServiceTest {
     fun setUp() {
         val gameDao = mockk<GameDao>()
         val guessFinderService = mockk<GuessFinderService>()
-        every {gameDao.createGame(any())} returns Unit
+        every {gameDao.createGame(any())} returns getGameStub()
         every {gameDao.findActiveGameById(999)} returns null
         every {gameDao.findActiveGameById(1)} returns mockk<Game>()
         every {gameDao.updateGameTimes(any(), any(), any(), any())} returns getUpdatedGameStub()
@@ -119,11 +119,24 @@ class GameUpsertServiceTest {
         val gameName = userGameName ?: "Game"
 
         return if(member != null) {
-            "$gameName by ${member.mention}" + " : package arriving between " + startTime + " and " + closeTime +
+            "$gameName (#1) by ${member.mention}" + " : package arriving between " + startTime + " and " + closeTime +
                     ". Guesses accepted until " + guessesCloseTime
         } else {
-            "$gameName by $username" + " : package arriving between " + startTime + " and " + closeTime +
+            "$gameName (#1) by $username" + " : package arriving between " + startTime + " and " + closeTime +
                     ". Guesses accepted until " + guessesCloseTime
         }
+    }
+
+    private fun getGameStub(): Game {
+        return Game(
+            gameId = 1,
+            gameName = "Testing testing",
+            windowStart = ZonedDateTime.now().withHour(15).withMinute(0),
+            windowClose = ZonedDateTime.now().withHour(19).withMinute(0),
+            guessesClose = ZonedDateTime.now().withHour(14).withMinute(0),
+            deliveryTime = null,
+            userId = "Z",
+            gameActive = true
+        )
     }
 }

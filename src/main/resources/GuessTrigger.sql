@@ -1,9 +1,6 @@
 CREATE OR REPLACE FUNCTION check_gameid_and_guesstime()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM game WHERE gameid = NEW.gameid) THEN
-        RAISE EXCEPTION 'Game ID % does not exist.', NEW.gameid USING ERRCODE = 'ERRA0';
-    END IF;
     IF NOT (NEW.guesstime BETWEEN (SELECT windowstart FROM game WHERE gameid = NEW.gameid) AND (SELECT windowclose FROM game WHERE gameid = NEW.gameid)) THEN
         RAISE EXCEPTION 'Guess time % is not between start and closing window range of the game', NEW.guesstime USING ERRCODE = 'ERRA1';
     END IF;

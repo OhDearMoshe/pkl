@@ -179,4 +179,30 @@ class GuessDaoTest {
         val result = target.findGuessesByGameId(999)
         assertTrue { result.isEmpty() }
     }
+
+    @DisplayName("createGuess() will update data if user has guessed before")
+    @Test
+    fun canSuccessfullyUpdateDataWhenUserHasGuessedBefore() {
+        val expected = Guess(
+            null,
+            gameId = 1,
+            userId = "PostMasterGeneral",
+            guessTime = ZonedDateTime.parse("2023-04-07T16:00:00.000Z[Europe/London]")
+        )
+        target.createGuess(expected)
+
+        val expected2 = Guess(
+            null,
+            gameId = 1,
+            userId = "PostMasterGeneral",
+            guessTime = ZonedDateTime.parse("2023-04-07T17:00:00.000Z[Europe/London]")
+        )
+        target.createGuess(expected2)
+
+        val result = target.findGuessesByGameId(1)
+        assertEquals(result.size, 1)
+        assertEquals(result[0].userId, expected2.userId)
+        assertEquals(result[0].gameId, expected2.gameId)
+        assertEquals(result[0].guessTime, expected2.guessTime)
+    }
 }

@@ -52,6 +52,7 @@ suspend fun main() {
         val findGuessExtension = FindGuessExtension(guessFinderService, SERVER_ID)
         val endGameExtension = EndGameExtension(gameEndService, SERVER_ID)
         val leaderboardExtension = LeaderboardExtension(leaderboardService, SERVER_ID)
+        val commandsExtension = CommandsExtension(SERVER_ID)
 
         val bot = ExtensibleBot(BOT_TOKEN) {
             chatCommands {
@@ -67,6 +68,7 @@ suspend fun main() {
                 add { findGuessExtension }
                 add { endGameExtension }
                 add { leaderboardExtension }
+                add { commandsExtension }
             }
         }
 

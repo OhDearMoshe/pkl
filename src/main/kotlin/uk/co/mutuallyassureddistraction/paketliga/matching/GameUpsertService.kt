@@ -37,12 +37,11 @@ class GameUpsertService(private val gameDao: GameDao, private val guessFinderSer
             val guessesCloseDate = guessesCloseDates.parserOutputs[0].dateRange.start
             val gameName = userGameName ?: "Game"
 
-            val gameNameString = gameNameStringMaker(gameName, member, username)
             val startDateString = startDate.toString(dtf)
             val closeDateString = closeDate.toString(dtf)
             val guessesCloseDateString = guessesCloseDate.toString(dtf)
 
-            gameDao.createGame(
+            val createdGame = gameDao.createGame(
                 Game(
                     gameId = null,
                     gameName = gameName,
@@ -54,6 +53,8 @@ class GameUpsertService(private val gameDao: GameDao, private val guessFinderSer
                     gameActive = true
                 )
             )
+
+            val gameNameString = gameNameStringMaker(gameName, member, username, createdGame.gameId!!)
 
             return gameNameString + " : package arriving between " + startDateString + " and " + closeDateString +
                     ". Guesses accepted until " + guessesCloseDateString
@@ -112,13 +113,13 @@ class GameUpsertService(private val gameDao: GameDao, private val guessFinderSer
         return parser.parse(dateString, referenceDate, hawkingConfiguration, "eng")
     }
 
-    private fun gameNameStringMaker(gameName: String?, member: Member?, username: String): String {
+    private fun gameNameStringMaker(gameName: String?, member: Member?, username: String, gameId: Int): String {
         return if(member != null) {
-            "$gameName by ${member.mention}"
+            "$gameName (#$gameId) by ${member.mention}"
         } else {
             // We need username for non-server users that are using this command, if any (hence the nullable Member)
             // Kinda unlikely, but putting this here just in case
-            "$gameName by $username"
+            "$gameName (#$gameId) by $username"
         }
     }
 }
